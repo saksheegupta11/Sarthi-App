@@ -1,0 +1,21 @@
+# Dependency directories
+node_modules/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Environment variables (Safety net)
+.env
+.env.*
+
+# Build directories
+dist/
+build/
+dev-dist/
+
+# Local history / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
