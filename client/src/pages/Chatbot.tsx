@@ -12,7 +12,8 @@ import {
   X, 
   Clock,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Loader2
 } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import type { ChatMessage } from "../backend";
@@ -52,7 +53,6 @@ const SUGGESTED_QUESTIONS = [
 
 export default function Chatbot() {
   const [currentSessionId, setCurrentSessionId] = useState<string>(() => {
-    // Try to get the last active session from localStorage or generate new
     const saved = localStorage.getItem('lastChatSessionId');
     return saved || crypto.randomUUID();
   });
@@ -63,7 +63,7 @@ export default function Chatbot() {
   
   const [input, setInput] = useState("");
   const [localMessages, setLocalMessages] = useState<
-    Array<{ sender: string; message: string; timestamp: number }>
+    Array<{ sender: string; message: string; timestamp: number; pending?: boolean }>
   >([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -78,7 +78,6 @@ export default function Chatbot() {
   // Load history into local messages when session changes or history loads
   useEffect(() => {
     if (!isHistoryLoading) {
-      // Sync messages if session changed
       if (currentSessionId !== lastSyncedSessionId.current) {
         if (chatHistory && chatHistory.length > 0) {
           setLocalMessages(
@@ -103,34 +102,53 @@ export default function Chatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [localMessages]);
 
-  const handleSend = (messageText?: string) => {
+  const handleSend = async (messageText?: string) => {
     const text = (messageText ?? input).trim();
     if (!text) return;
 
+    const timestamp = Date.now();
     const userMsg = {
       sender: "User",
       message: text,
-      timestamp: Date.now(),
+      timestamp,
     };
     
     setLocalMessages((prev) => [...prev, userMsg]);
     setInput("");
 
-    // Generate bot response client-side for immediate feedback
-    const responseText = getChatbotResponse(text);
-    const botMsg = {
-      sender: "Chatbot",
-      message: responseText,
-      timestamp: Date.now() + 100,
-    };
-    
-    // Simulate thinking delay for bot feel
-    setTimeout(() => {
-      setLocalMessages((prev) => [...prev, botMsg]);
-    }, 600);
+    // Add a temporary bot message (thinking)
+    const tempId = Date.now() + 1;
+    setLocalMessages((prev) => [
+      ...prev,
+      { sender: "Chatbot", message: "⏳ Thinking...", timestamp: tempId, pending: true },
+    ]);
 
-    // Persist to backend
-    sendMessage.mutate({ message: text, sessionId: currentSessionId });
+    try {
+      // Send to backend
+      const result = await sendMessage.mutateAsync({
+        message: text,
+        sessionId: currentSessionId,
+      });
+
+      // Replace the temporary message with the real response
+      setLocalMessages((prev) =>
+        prev.map((msg) =>
+          msg.timestamp === tempId
+            ? { sender: "Chatbot", message: result.reply, timestamp: Date.now() + 100 }
+            : msg
+        )
+      );
+    } catch (error) {
+      // On error, replace temporary message with an error message
+      setLocalMessages((prev) =>
+        prev.map((msg) =>
+          msg.timestamp === tempId
+            ? { sender: "Chatbot", message: "Sorry, I'm having trouble. Please try again.", timestamp: Date.now() + 100 }
+            : msg
+        )
+      );
+      console.error("Failed to send message:", error);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -344,6 +362,7 @@ export default function Chatbot() {
                               <div className={`
                                 w-9 h-9 rounded-2xl shrink-0 flex items-center justify-center shadow-md transition-transform group-hover:scale-110
                                 ${isUser ? "bg-amber-500 text-white" : "bg-teal-600 text-white"}
+                                ${msg.pending ? "opacity-50" : ""}
                               `}>
                                 {isUser ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
                               </div>
@@ -354,8 +373,10 @@ export default function Chatbot() {
                                   ${isUser 
                                     ? "bg-teal-600 text-white rounded-tr-none" 
                                     : "bg-card border border-border text-foreground rounded-tl-none font-medium text-muted-foreground/90"}
+                                  ${msg.pending ? "animate-pulse" : ""}
                                 `}>
                                   {msg.message}
+                                  {msg.pending && <span className="ml-1">🤔</span>}
                                 </div>
                                 <span className="text-[10px] text-muted-foreground font-bold tracking-tight opacity-0 group-hover:opacity-100 transition-opacity px-2">
                                   {formatTime(msg.timestamp)}
@@ -401,10 +422,14 @@ export default function Chatbot() {
                     />
                     <Button
                       onClick={() => handleSend()}
-                      disabled={!input.trim()}
+                      disabled={!input.trim() || sendMessage.isPending}
                       className="h-12 w-12 shrink-0 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl shadow-xl shadow-teal-500/20 transition-all active:scale-90 disabled:opacity-20"
                     >
-                      <Send className="h-5 w-5" />
+                      {sendMessage.isPending ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <Send className="h-5 w-5" />
+                      )}
                     </Button>
                   </div>
                 </div>

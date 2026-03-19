@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: [],
+      includeAssets: ['assets/images/pwa-icon.svg', 'assets/images/sarthi-dashboard.png'],
       manifest: {
         id: 'sarthi-pwa',
         name: 'Sarthi',
@@ -23,34 +23,42 @@ export default defineConfig({
         scope: '/',
         icons: [
           {
-            src: '/assets/images/sarthi-mobile-logo.png',
+            src: 'assets/images/sarthi-mobile-logo.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: '/assets/images/sarthi-mobile-logo.png',
+            src: 'assets/images/sarthi-mobile-logo.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: '/assets/images/sarthi-mobile-logo.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'maskable'
-          },
-          {
-            src: '/assets/images/sarthi-mobile-logo.png',
+            src: 'assets/images/sarthi-mobile-logo.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
           }
         ],
+        screenshots: [
+          {
+            src: 'assets/images/sarthi-dashboard.png',
+            sizes: '1200x400',
+            type: 'image/png',
+            label: 'Sarthi Dashboard'
+          },
+          {
+            src: 'assets/images/sarthi-dashboard.png',
+            sizes: '1200x400',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Sarthi Dashboard Wide'
+          }
+        ]
       },
       workbox: {
         navigateFallbackAllowlist: [/^\/$/], // Simplified for now to avoid complexity
-        // We will let Workbox handle the default caching to satisfy Chrome's "fetch" requirement
       },
       devOptions: {
         enabled: true,

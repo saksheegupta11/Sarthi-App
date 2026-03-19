@@ -13,6 +13,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@genkit-ai/ai": "^0.5.5",
+    "@genkit-ai/googleai": "^0.5.5",
+    "@google/generative-ai": "^0.21.0",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
