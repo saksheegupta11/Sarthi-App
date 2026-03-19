@@ -24,16 +24,28 @@ export default defineConfig({
         icons: [
           {
             src: '/assets/images/sarthi-mobile-logo.png',
-            sizes: '512x512',
+            sizes: '192x192',
             type: 'image/png',
-            purpose: 'any',
+            purpose: 'any'
           },
           {
             src: '/assets/images/sarthi-mobile-logo.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'maskable',
+            purpose: 'any'
           },
+          {
+            src: '/assets/images/sarthi-mobile-logo.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable'
+          },
+          {
+            src: '/assets/images/sarthi-mobile-logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
         ],
       },
       workbox: {
