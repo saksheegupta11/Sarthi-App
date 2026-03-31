@@ -10,6 +10,7 @@ export interface IUser extends mongoose.Document {
   appearance: 'light' | 'dark';
   savedScholarships: string[]; // titles
   savedInternships: string[];
+  savedColleges: string[];
   otp?: string;
   otpExpiry?: Date;
 }
@@ -24,6 +25,7 @@ const userSchema = new mongoose.Schema<IUser>({
   appearance: { type: String, enum: ['light', 'dark'], default: 'light' },
   savedScholarships: [String],
   savedInternships: [String],
+  savedColleges: [String],
   otp: String,
   otpExpiry: Date,
 }, { timestamps: true });

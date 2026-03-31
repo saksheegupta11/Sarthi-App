@@ -20,6 +20,7 @@ export interface Profile {
   appearance: 'light' | 'dark';
   savedScholarships?: string[];
   savedInternships?: string[];
+  savedColleges?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -65,6 +66,18 @@ export interface Internship {
   eligibility?: string;
   link: string;
   category: 'Engineering' | 'Medical' | 'Commerce' | 'Arts';
+}
+
+// Colleges
+export interface College {
+  name: string;
+  location: string;
+  type: 'Government' | 'Private';
+  courses: string[];
+  eligibility: string;
+  link: string;
+  image?: string;
+  rating?: number;
 }
 
 // Mock Tests

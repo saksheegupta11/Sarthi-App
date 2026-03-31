@@ -9,6 +9,7 @@ import scholarshipRoutes from './routes/scholarshipRoutes';
 import internshipRoutes from './routes/internshipRoutes';
 import mockTestRoutes from './routes/mockTestRoutes';
 import chatbotRoutes from './routes/chatbotRoutes';
+import collegeRoutes from './routes/collegeRoutes';
 
 dotenv.config();
 connectDB();
@@ -24,6 +25,7 @@ app.use('/api/scholarships', scholarshipRoutes);
 app.use('/api/internships', internshipRoutes);
 app.use('/api/mocktest', mockTestRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/colleges', collegeRoutes);
 
 if (process.env['NODE_ENV'] !== 'production') {
   const PORT = process.env['PORT'] || 5000;

@@ -62,6 +62,7 @@ export default function TopNav() {
             { label: "Career Quiz", path: "/career-quiz" },
             { label: "Scholarships", path: "/scholarships" },
             { label: "Internships", path: "/internships" },
+            { label: "College Finder", path: "/college-finder" },
             { label: "Mock Test", path: "/mock-test" },
             { label: "Chatbot", path: "/chatbot" },
           ].map((item) => (

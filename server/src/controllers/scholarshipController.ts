@@ -33,6 +33,27 @@ export const saveScholarship = async (req: Request, res: Response): Promise<void
   }
 };
 
+export const unsaveScholarship = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title } = req.body;
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { savedScholarships: title },
+    });
+
+    res.json({ message: 'Scholarship removed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to remove scholarship' });
+  }
+};
+
 export const getSavedScholarships = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId;

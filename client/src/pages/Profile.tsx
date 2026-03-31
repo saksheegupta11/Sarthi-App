@@ -23,7 +23,9 @@ import {
   LogOut,
   Moon,
   Save,
+  School,
   Sun,
+  Trash2,
   User,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -36,9 +38,13 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../hooks/useAuth"; // 👈 new import
 import {
   useGetCallerUserProfile,
+  useGetSavedColleges,
   useGetSavedInternships,
   useGetSavedScholarships,
   useSaveCallerUserProfile,
+  useUnsaveCollege,
+  useUnsaveInternship,
+  useUnsaveScholarship,
 } from "../hooks/useQueries";
 
 export default function Profile() {
@@ -51,7 +57,11 @@ export default function Profile() {
     useGetCallerUserProfile();
   const { data: savedScholarships = [] } = useGetSavedScholarships();
   const { data: savedInternships = [] } = useGetSavedInternships();
+  const { data: savedColleges = [] } = useGetSavedColleges();
   const saveProfile = useSaveCallerUserProfile();
+  const unsaveScholarship = useUnsaveScholarship();
+  const unsaveInternship = useUnsaveInternship();
+  const unsaveCollege = useUnsaveCollege();
 
   const [name, setName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -298,13 +308,23 @@ export default function Profile() {
                         <span className="text-sm font-medium text-foreground truncate flex-1 mr-2">
                           {title}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => navigate({ to: "/scholarships" })}
-                          className="text-xs text-teal hover:underline flex-shrink-0"
-                        >
-                          View
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => navigate({ to: "/scholarships" })}
+                            className="text-xs text-teal hover:underline flex-shrink-0"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => unsaveScholarship.mutate(title)}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                            title="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -347,13 +367,82 @@ export default function Profile() {
                         <span className="text-sm font-medium text-foreground truncate flex-1 mr-2">
                           {title}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => navigate({ to: "/internships" })}
-                          className="text-xs text-teal hover:underline flex-shrink-0"
-                        >
-                          View
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => navigate({ to: "/internships" })}
+                            className="text-xs text-teal hover:underline flex-shrink-0"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => unsaveInternship.mutate(title)}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                            title="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Saved Colleges */}
+              <div className="bg-card rounded-2xl border border-border shadow-card p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <School className="h-5 w-5 text-amber" />
+                  <h2 className="font-heading font-semibold text-lg text-foreground">
+                    Saved Colleges
+                  </h2>
+                  <Badge
+                    variant="secondary"
+                    className="ml-auto bg-amber/20 text-amber-dark border-amber/20"
+                  >
+                    {savedColleges.length}
+                  </Badge>
+                </div>
+                {savedColleges.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <School className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">No saved colleges yet.</p>
+                    <button
+                      type="button"
+                      onClick={() => navigate({ to: "/college-finder" })}
+                      className="text-teal text-sm font-medium hover:underline mt-1"
+                    >
+                      Browse Colleges →
+                    </button>
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {savedColleges.map((name) => (
+                      <li
+                        key={name}
+                        className="flex items-center justify-between px-4 py-3 rounded-xl bg-muted/40 border border-border"
+                      >
+                        <span className="text-sm font-medium text-foreground truncate flex-1 mr-2">
+                          {name}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => navigate({ to: "/college-finder" })}
+                            className="text-xs text-teal hover:underline flex-shrink-0"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => unsaveCollege.mutate(name)}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                            title="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>

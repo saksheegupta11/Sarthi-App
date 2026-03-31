@@ -17,6 +17,7 @@ import {
   useGetAllInternships,
   useGetSavedInternships,
   useSaveInternship,
+  useUnsaveInternship,
 } from "../hooks/useQueries";
 
 type Category = "All" | "Engineering" | "Medical" | "Commerce" | "Arts";
@@ -136,6 +137,7 @@ export default function Internships() {
   const { data: backendInternships, isLoading } = useGetAllInternships();
   const { data: savedTitles = [] } = useGetSavedInternships();
   const saveInternship = useSaveInternship();
+  const unsaveInternship = useUnsaveInternship();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("All");
   const [savingTitle, setSavingTitle] = useState<string | null>(null);
@@ -167,16 +169,18 @@ export default function Internships() {
   });
 
   const handleSave = async (title: string) => {
-    if (savedTitles.includes(title)) {
-      toast.info("Already saved to your collection!");
-      return;
-    }
+    const isSaved = savedTitles.includes(title);
     setSavingTitle(title);
     try {
-      await saveInternship.mutateAsync(title);
-      toast.success("Internship saved to your collection!");
+      if (isSaved) {
+        await unsaveInternship.mutateAsync(title);
+        toast.success("Internship removed from collections");
+      } else {
+        await saveInternship.mutateAsync(title);
+        toast.success("Internship saved to your collection!");
+      }
     } catch {
-      toast.error("Failed to save. Please try again.");
+      toast.error("Failed to update collection. Please try again.");
     } finally {
       setSavingTitle(null);
     }

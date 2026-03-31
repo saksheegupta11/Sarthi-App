@@ -3,6 +3,7 @@ import { authMiddleware } from '../middleware/auth';
 import {
   getAllInternships,
   saveInternship,
+  unsaveInternship,
   getSavedInternships,
 } from '../controllers/internshipController';
 
@@ -13,6 +14,7 @@ router.use(authMiddleware);
 
 router.get('/', getAllInternships);
 router.post('/save', saveInternship);
+router.post('/unsave', unsaveInternship);
 router.get('/saved', getSavedInternships);
 
 export default router;

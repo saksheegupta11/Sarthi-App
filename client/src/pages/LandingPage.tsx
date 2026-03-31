@@ -20,6 +20,7 @@ import {
   GraduationCap,
   Loader2,
   MessageCircle,
+  School,
   User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -160,6 +161,12 @@ export default function LandingPage() {
       title: "Mock Tests",
       desc: "Practice with subject-wise mock tests and track your performance.",
       color: "bg-amber-50 text-amber-600",
+    },
+    {
+      icon: <School className="h-6 w-6" />,
+      title: "College Finder",
+      desc: "Explore top universities and find the perfect environment for your higher education.",
+      color: "bg-teal-50 text-teal-600",
     },
     {
       icon: <MessageCircle className="h-6 w-6" />,

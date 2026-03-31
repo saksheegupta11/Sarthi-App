@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
-import type { Profile, CareerQuizResult, Scholarship, Internship, ChatMessage } from '../backend';
+import type { Profile, CareerQuizResult, Scholarship, Internship, ChatMessage, College } from '../backend';
 
 // ========== Profile ==========
 export const useGetCallerUserProfile = () => {
@@ -94,6 +94,19 @@ export const useSaveScholarship = () => {
   });
 };
 
+export const useUnsaveScholarship = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (title: string) => {
+      const { data } = await api.post('/scholarships/unsave', { title });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedScholarships'] });
+    },
+  });
+};
+
 // ========== Internships ==========
 export const useGetAllInternships = () => {
   return useQuery({
@@ -124,6 +137,66 @@ export const useSaveInternship = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['savedInternships'] });
+    },
+  });
+};
+
+export const useUnsaveInternship = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (title: string) => {
+      const { data } = await api.post('/internships/unsave', { title });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedInternships'] });
+    },
+  });
+};
+
+// ========== Colleges ==========
+export const useGetAllColleges = () => {
+  return useQuery({
+    queryKey: ['colleges'],
+    queryFn: async () => {
+      const { data } = await api.get('/colleges');
+      return data as College[];
+    },
+  });
+};
+
+export const useGetSavedColleges = () => {
+  return useQuery({
+    queryKey: ['savedColleges'],
+    queryFn: async () => {
+      const { data } = await api.get('/colleges/saved');
+      return data as string[];
+    },
+  });
+};
+
+export const useSaveCollege = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const { data } = await api.post('/colleges/save', { name });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedColleges'] });
+    },
+  });
+};
+
+export const useUnsaveCollege = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const { data } = await api.post('/colleges/unsave', { name });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedColleges'] });
     },
   });
 };

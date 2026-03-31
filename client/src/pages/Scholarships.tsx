@@ -16,6 +16,7 @@ import {
   useGetAllScholarships,
   useGetSavedScholarships,
   useSaveScholarship,
+  useUnsaveScholarship,
 } from "../hooks/useQueries";
 
 // Augmented static data to supplement backend
@@ -102,6 +103,7 @@ export default function Scholarships() {
   const { data: backendScholarships, isLoading } = useGetAllScholarships();
   const { data: savedTitles = [] } = useGetSavedScholarships();
   const saveScholarship = useSaveScholarship();
+  const unsaveScholarship = useUnsaveScholarship();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"All" | "Government" | "Private">("All");
   const [savingTitle, setSavingTitle] = useState<string | null>(null);
@@ -132,16 +134,18 @@ export default function Scholarships() {
   });
 
   const handleSave = async (title: string) => {
-    if (savedTitles.includes(title)) {
-      toast.info("Already saved to your collection!");
-      return;
-    }
+    const isSaved = savedTitles.includes(title);
     setSavingTitle(title);
     try {
-      await saveScholarship.mutateAsync(title);
-      toast.success("Scholarship saved to your collection!");
+      if (isSaved) {
+        await unsaveScholarship.mutateAsync(title);
+        toast.success("Scholarship removed from collections");
+      } else {
+        await saveScholarship.mutateAsync(title);
+        toast.success("Scholarship saved to your collection!");
+      }
     } catch {
-      toast.error("Failed to save. Please try again.");
+      toast.error("Failed to update collection. Please try again.");
     } finally {
       setSavingTitle(null);
     }

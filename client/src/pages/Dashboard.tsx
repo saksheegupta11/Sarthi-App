@@ -7,7 +7,9 @@ import {
   Briefcase,
   ChevronRight,
   GraduationCap,
+  Library,
   MessageCircle,
+  School,
   Sparkles,
 } from "lucide-react";
 import React from "react";
@@ -64,6 +66,16 @@ const featureCards = [
     color: "from-teal to-teal-dark",
     badge: "AI",
     badgeColor: "bg-amber/20 text-amber-dark",
+  },
+  {
+    title: "College Finder",
+    description:
+      "Explore top universities and find the perfect environment for your education.",
+    icon: School,
+    path: "/college-finder",
+    color: "from-amber to-amber-dark",
+    badge: "New",
+    badgeColor: "bg-teal/10 text-teal",
   },
 ];
 
@@ -157,9 +169,9 @@ export default function Dashboard() {
         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: "Scholarships", value: "10+", icon: Award },
+            { label: "Top Colleges", value: "50+", icon: School },
             { label: "Internships", value: "8+", icon: Briefcase },
             { label: "Mock Tests", value: "5", icon: GraduationCap },
-            { label: "AI Mentor", value: "24/7", icon: MessageCircle },
           ].map((stat) => {
             const Icon = stat.icon;
             return (

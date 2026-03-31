@@ -52,6 +52,28 @@ export const saveInternship = async (req: Request, res: Response): Promise<void>
   }
 };
 
+// POST /api/internships/unsave
+export const unsaveInternship = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title } = req.body;
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { savedInternships: title },
+    });
+
+    res.json({ message: 'Internship removed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to remove internship' });
+  }
+};
+
 // GET /api/internships/saved
 export const getSavedInternships = async (req: Request, res: Response): Promise<void> => {
   try {

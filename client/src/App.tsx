@@ -19,6 +19,7 @@ import MockTest from "./pages/MockTest";
 import MockTestResult from "./pages/MockTestResult";
 import Profile from "./pages/Profile";
 import Scholarships from "./pages/Scholarships";
+import CollegeFinder from "./pages/CollegeFinder";
 
 // Root route
 const rootRoute = createRootRoute({
@@ -77,6 +78,12 @@ const internshipsRoute = createRoute({
   component: Internships,
 });
 
+const collegeFinderRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: "/college-finder",
+  component: CollegeFinder,
+});
+
 const mockTestRoute = createRoute({
   getParentRoute: () => authLayoutRoute,
   path: "/mock-test",
@@ -109,6 +116,7 @@ const routeTree = rootRoute.addChildren([
     careerQuizResultRoute,
     scholarshipsRoute,
     internshipsRoute,
+    collegeFinderRoute,
     mockTestRoute,
     mockTestResultRoute,
     chatbotRoute,
