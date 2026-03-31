@@ -1,19 +1,20 @@
-# Sarthi - Your Career Guide (Client)
+# 🎨 Sarthi - Frontend (Client)
 
-This is the frontend of the Sarthi project, built with **React**, **TypeScript**, and **Vite**.
+This is the frontend of the Sarthi platform, built with modern web technologies to provide a fast, responsive, and installable experience.
 
-## Tech Stack
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS / Shadcn UI
+## 🛠️ Tech Stack
+- **Framework**: React 18 (Vite)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS & Shadcn UI
 - **Routing**: TanStack Router
 - **State Management**: TanStack Query (React Query)
 - **Icons**: Lucide React
+- **PWA**: Vite PWA Plugin
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v18+)
 - npm or yarn
 
 ### Installation
@@ -33,14 +34,15 @@ npm run dev
 ```
 The app will be available at `http://localhost:5173`.
 
-### Environment Variables
-Create a `.env` file in the `client` directory with the following variables:
+### ⚙️ Environment Variables
+Create a `.env` file in the `client` directory:
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000/api
 ```
 
-## Features
-- **PWA Support**: Installable as a mobile/desktop app.
-- **Career Quiz**: AI-powered assessment.
-- **Scholarships & Internships**: Targeted domain exploration.
-- **AI Chatbot**: Personalized career guidance.
+## ✨ Features
+- 📱 **Progressive Web App**: Offline support and home screen installation.
+- 🧠 **AI Career Quiz**: Interactive assessment flow.
+- 🏫 **College Finder**: Search and filter through 100+ Indian institutions.
+- 💼 **Scholarships & Internships**: Targeted exploration with saved items support.
+- 🤖 **AI Chatbot**: Real-time career mentoring.
