@@ -20,7 +20,7 @@ const sendOTP = async (email: string, otp: string) => {
     from: process.env['EMAIL_USER'],
     to: email,
     subject: 'Your Sarthi Login OTP',
-    text: `Your OTP is: ${otp}. It is valid for 10 minutes.`,
+    text: `Your OTP is: ${otp}. It is valid for 3 minutes.`,
   };
 
   try {
@@ -48,8 +48,8 @@ const sendOTP = async (email: string, otp: string) => {
 //     from: '"Sarthi" <sarthi@example.com>',
 //     to: email,
 //     subject: 'Your Sarthi Login OTP',
-//     text: `Your OTP is: ${otp}. It is valid for 10 minutes.`,
-//     html: `<b>Your OTP is: ${otp}</b><br>It is valid for 10 minutes.`,
+//     text: `Your OTP is: ${otp}. It is valid for 3 minutes.`,
+//     html: `<b>Your OTP is: ${otp}</b><br>It is valid for 3 minutes.`,
 //   };
 
 //   const info = await transporter.sendMail(mailOptions);
@@ -74,7 +74,7 @@ export const requestOTP = async (req: Request, res: Response): Promise<void> => 
     }
 
     const otp = generateOTP();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otpExpiry = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
 
     // Upsert user (only if not login, or if login it will just update)
     // Actually, if it's login, the user must exist. If it's registration, it will be created.
