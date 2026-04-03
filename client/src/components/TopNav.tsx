@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { BookOpen, LogOut, User } from "lucide-react";
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -17,6 +17,7 @@ import { usePwaInstall } from "../hooks/usePWAInstall";
 
 export default function TopNav() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
   const { data: profile } = useGetCallerUserProfile();
   const queryClient = useQueryClient();
@@ -65,16 +66,23 @@ export default function TopNav() {
             { label: "College Finder", path: "/college-finder" },
             { label: "Mock Test", path: "/mock-test" },
             { label: "Chatbot", path: "/chatbot" },
-          ].map((item) => (
-            <button
-              type="button"
-              key={item.path}
-              onClick={() => navigate({ to: item.path })}
-              className="px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-teal hover:bg-teal/5 rounded-md transition-colors"
-            >
-              {item.label}
-            </button>
-          ))}
+          ].map((item) => {
+            const isActive = location.pathname.startsWith(item.path);
+            return (
+              <button
+                type="button"
+                key={item.path}
+                onClick={() => navigate({ to: item.path })}
+                className={`px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+                  isActive
+                    ? "text-teal bg-teal/10"
+                    : "text-muted-foreground hover:text-teal hover:bg-teal/5"
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-4">

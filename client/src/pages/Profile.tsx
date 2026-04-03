@@ -65,8 +65,9 @@ export default function Profile() {
 
   const [name, setName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [school, setSchool] = useState("");
-  const [classYear, setClassYear] = useState("");
+  const [phone, setPhone] = useState("");
+  const [educationLevel, setEducationLevel] = useState("");
+  const [stream, setStream] = useState("");
   const [language, setLanguage] = useState("en");
 
   // Populate form when profile loads
@@ -74,8 +75,9 @@ export default function Profile() {
     if (profile) {
       setName(profile.name || "");
       setDateOfBirth(profile.dateOfBirth || "");
-      setSchool(profile.school || "");
-      setClassYear(profile.classYear || "");
+      setPhone(profile.phone || "");
+      setEducationLevel(profile.educationLevel || "");
+      setStream(profile.stream || "");
       setLanguage(profile.language || "en");
     }
   }, [profile]);
@@ -90,8 +92,9 @@ export default function Profile() {
       const updatedProfile: ProfileType = {
         name: name.trim(),
         dateOfBirth,
-        school,
-        classYear,
+        phone,
+        educationLevel,
+        stream,
         language,
         appearance:
           theme === "dark" ? Variant_dark_light.dark : Variant_dark_light.light,
@@ -160,17 +163,17 @@ export default function Profile() {
                 <h1 className="font-heading text-xl font-bold text-foreground">
                   {displayName}
                 </h1>
-                {profile?.school && (
+                {profile?.educationLevel && (
                   <p className="text-muted-foreground text-sm">
-                    {profile.school}
+                    {profile.educationLevel} {profile?.stream ? `(${profile.stream})` : ""}
                   </p>
                 )}
-                {profile?.classYear && (
+                {profile?.phone && (
                   <Badge
                     variant="secondary"
                     className="mt-1 bg-teal/10 text-teal border-teal/20 text-xs"
                   >
-                    {profile.classYear}
+                    {profile.phone}
                   </Badge>
                 )}
               </div>
@@ -225,25 +228,55 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="school">School / College Name</Label>
+                  <Label htmlFor="phone">Phone Number</Label>
                   <Input
-                    id="school"
-                    value={school}
-                    onChange={(e) => setSchool(e.target.value)}
-                    placeholder="e.g. Delhi Public School"
+                    id="phone"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="e.g. +91 9876543210"
                     className="focus-visible:ring-teal"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="classYear">Class / Year</Label>
-                  <Input
-                    id="classYear"
-                    value={classYear}
-                    onChange={(e) => setClassYear(e.target.value)}
-                    placeholder="e.g. Class 12 / 2nd Year B.Tech"
-                    className="focus-visible:ring-teal"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="educationLevel">Education Level</Label>
+                    <Select
+                      value={educationLevel}
+                      onValueChange={(val) => setEducationLevel(val)}
+                    >
+                      <SelectTrigger id="educationLevel" className="focus:ring-teal">
+                        <SelectValue placeholder="Select level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10th">Class 10</SelectItem>
+                        <SelectItem value="12th">Class 12</SelectItem>
+                        <SelectItem value="Undergraduate">Undergraduate</SelectItem>
+                        <SelectItem value="Postgraduate">Postgraduate</SelectItem>
+                        <SelectItem value="Diploma">Diploma</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="stream">Stream</Label>
+                    <Select
+                      value={stream}
+                      onValueChange={(val) => setStream(val)}
+                    >
+                      <SelectTrigger id="stream" className="focus:ring-teal">
+                        <SelectValue placeholder="Select stream" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Science">Science</SelectItem>
+                        <SelectItem value="Commerce">Commerce</SelectItem>
+                        <SelectItem value="Arts">Arts</SelectItem>
+                        <SelectItem value="Vocational">Vocational</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="pt-2">
@@ -474,7 +507,7 @@ export default function Profile() {
                     <SelectContent>
                       <SelectItem value="en">🇬🇧 English</SelectItem>
                       <SelectItem value="hi">🇮🇳 Hindi (हिंदी)</SelectItem>
-                      <SelectItem value="mr">Maharashtra (मराठी)</SelectItem>
+                      <SelectItem value="mr">Marathi (मराठी)</SelectItem>
                       <SelectItem value="gu">Gujarati (ગુજરાતી)</SelectItem>
                       <SelectItem value="ta">Tamil (தமிழ்)</SelectItem>
                     </SelectContent>
