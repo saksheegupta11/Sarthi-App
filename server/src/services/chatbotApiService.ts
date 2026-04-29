@@ -4,7 +4,7 @@ import { getChatbotResponse as getRuleBasedResponse } from '../utils/chatbotResp
 
 export interface ChatbotResponse {
   reply: string;
-  source: 'openai' | 'gemini' | 'openrouter' | 'rule-based' | 'grok';
+  source: 'openai' | 'gemini' | 'openrouter' | 'rule-based' | 'grok' | 'sarvam' | 'groq';
 }
 
 // API Keys from environment
@@ -12,6 +12,8 @@ const OPENAI_API_KEY = process.env['OPENAI_API_KEY'] || '';
 const GEMINI_API_KEY = process.env['GEMINI_API_KEY'] || '';
 const OPENROUTER_API_KEY = process.env['OPENROUTER_API_KEY'] || '';
 const GROK_API_KEY = process.env['GROK_API_KEY'] || '';
+const SARVAM_API_KEY = process.env['SARVAM_API_KEY'] || '';
+const GROQ_API_KEY = process.env['GROQ_API_KEY'] || '';
 
 // --- API 0: Grok (xAI) ---
 async function fetchFromGrok(message: string): Promise<ChatbotResponse | null> {
@@ -46,6 +48,70 @@ async function fetchFromGrok(message: string): Promise<ChatbotResponse | null> {
     };
   } catch (error) {
     console.log('Grok API failed:', error instanceof Error ? error.message : 'Unknown error');
+    return null;
+  }
+}
+
+// --- API 0.1: Sarvam AI ---
+async function fetchFromSarvam(message: string): Promise<ChatbotResponse | null> {
+  try {
+    if (!SARVAM_API_KEY) return null;
+
+    const response = await axios.post(
+      'https://api.sarvam.ai/v1/chat/completions',
+      {
+        model: 'sarvam-m',
+        messages: [{ role: 'user', content: message }],
+        max_tokens: 300,
+        temperature: 0.7,
+      },
+      {
+        headers: {
+          'api-subscription-key': SARVAM_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        timeout: 8000,
+      }
+    );
+
+    return {
+      reply: response.data.choices[0].message.content,
+      source: 'sarvam',
+    };
+  } catch (error) {
+    console.log('Sarvam API failed:', error instanceof Error ? error.message : 'Unknown error');
+    return null;
+  }
+}
+
+// --- API 0.2: Groq Cloud ---
+async function fetchFromGroq(message: string): Promise<ChatbotResponse | null> {
+  try {
+    if (!GROQ_API_KEY) return null;
+
+    const response = await axios.post(
+      'https://api.groq.com/openai/v1/chat/completions',
+      {
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: message }],
+        max_tokens: 300,
+        temperature: 0.7,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 8000,
+      }
+    );
+
+    return {
+      reply: response.data.choices[0].message.content,
+      source: 'groq',
+    };
+  } catch (error) {
+    console.log('Groq API failed:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
 }
@@ -193,7 +259,21 @@ export async function getChatbotReply(message: string): Promise<ChatbotResponse>
     return openRouterResponse;
   }
 
-  console.log('OpenRouter failed, trying Grok API...');
+  console.log('OpenRouter failed, trying Sarvam AI...');
+  const sarvamResponse = await fetchFromSarvam(message);
+  if (sarvamResponse) {
+    console.log(`✅ Sarvam AI responded`);
+    return sarvamResponse;
+  }
+
+  console.log('Sarvam AI failed, trying Groq API...');
+  const groqResponse = await fetchFromGroq(message);
+  if (groqResponse) {
+    console.log(`✅ Groq responded`);
+    return groqResponse;
+  }
+
+  console.log('Groq failed, trying Grok API...');
   const grokResponse = await fetchFromGrok(message);
   if (grokResponse) {
     console.log(`✅ Grok responded`);
