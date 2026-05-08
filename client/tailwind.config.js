@@ -42,14 +42,14 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         teal: {
-          DEFAULT: "oklch(var(--teal))",
-          light: "oklch(var(--teal-light))",
-          dark: "oklch(var(--teal-dark))",
+          DEFAULT: "oklch(var(--teal) / <alpha-value>)",
+          light: "oklch(var(--teal-light) / <alpha-value>)",
+          dark: "oklch(var(--teal-dark) / <alpha-value>)",
         },
         amber: {
-          DEFAULT: "oklch(var(--amber))",
-          light: "oklch(var(--amber-light))",
-          dark: "oklch(var(--amber-dark))",
+          DEFAULT: "oklch(var(--amber) / <alpha-value>)",
+          light: "oklch(var(--amber-light) / <alpha-value>)",
+          dark: "oklch(var(--amber-dark) / <alpha-value>)",
         },
       },
       borderRadius: {

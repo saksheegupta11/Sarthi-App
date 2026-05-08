@@ -10,6 +10,10 @@ export interface ApiScholarship {
   amount?: string;
 }
 
+// RapidAPI
+const RAPIDAPI_KEY = process.env['RAPIDAPI_KEY'] || '';
+const SCHOLARSHIPS_API_HOST = process.env['SCHOLARSHIPS_API_HOST'] || '';
+
 // Static fallback data
 const STATIC_SCHOLARSHIPS: ApiScholarship[] = [
   {
@@ -47,50 +51,111 @@ const STATIC_SCHOLARSHIPS: ApiScholarship[] = [
     link: "https://www.foryoungwomeninscience.com",
     type: "Private",
   },
-  // Add more static scholarships as needed
+  {
+    title: "Post-Matric Scholarship for SC/ST Students",
+    description: "Financial assistance to students belonging to SC/ST categories for pursuing post-matriculation courses.",
+    eligibility: "SC/ST students, family income < ₹2.5 lakh/year",
+    link: "https://scholarships.gov.in",
+    type: "Government",
+  },
+  {
+    title: "Begum Hazrat Mahal National Scholarship",
+    description: "For meritorious girls belonging to minority communities.",
+    eligibility: "Minority girl students, Class IX to XII",
+    link: "https://maef.nic.in",
+    type: "Government",
+  },
+  {
+    title: "HDFC Bank Parivartan's ECS Scholarship",
+    description: "Support for meritorious and needy students from various levels of education.",
+    eligibility: "Class VI to Post-graduation, merit + need based",
+    link: "https://www.buddy4study.com/page/hdfc-bank-parivartans-ecs-scholarship",
+    type: "Private",
+  },
+  {
+    title: "Kotak Kanya Scholarship",
+    description: "Support for meritorious girl students from underprivileged families for professional graduation.",
+    eligibility: "Girl students, 12th pass, family income < ₹3 lakh/year",
+    link: "https://www.kotak.com",
+    type: "Private",
+  },
+  {
+    title: "LIC HFL Vidyadhan Scholarship",
+    description: "To support the education of underprivileged students.",
+    eligibility: "Class 8 to Post-graduation students",
+    link: "https://www.lichousing.com",
+    type: "Private",
+  },
 ];
 
-// --- API 1: 360Giving API (grants/scholarships data) ---
-async function fetchFrom360Giving(): Promise<ApiScholarship[]> {
+// --- API 1: RapidAPI (Primary) ---
+async function fetchFromRapidAPI(): Promise<ApiScholarship[]> {
   try {
-    // 360Giving API endpoint for grants
-    const response = await axios.get(
-      'https://grantnav.threesixtygiving.org/api/grants.json',
-      {
-        params: {
-          'funding_organisation.name': 'india', // Filter for India-related grants
-          limit: 20,
-        },
-        timeout: 5000,
-      }
-    );
+    const host = SCHOLARSHIPS_API_HOST || 'unstop-api.p.rapidapi.com';
+    const options = {
+      method: 'GET',
+      url: `https://${host}/workshops`,
+      params: {
+        page: '1'
+      },
+      headers: {
+        'X-RapidAPI-Key': RAPIDAPI_KEY,
+        'X-RapidAPI-Host': host,
+        'Content-Type': 'application/json'
+      },
+      timeout: 10000
+    };
 
-    return response.data.results.map((grant: any) => ({
-      title: grant.title || 'Scholarship Opportunity',
-      description: grant.description || 'No description available',
-      eligibility: grant.beneficiary_location?.[0]?.name || 'Check website',
-      link: grant.URL || grant['360g_grantDOI'] || '#',
-      type: 'Private',
-      amount: grant.amountAwarded ? `₹${grant.amountAwarded}` : undefined,
-      deadline: grant.plannedDates?.endDate,
+    console.log(`Fetching from Unstop (${host})...`);
+    const response = await axios.request(options);
+    
+    // Unstop API returns an array directly or inside a 'data' property
+    const rawData = response.data.data || (Array.isArray(response.data) ? response.data : []);
+    
+    console.log(`✅ Success! Fetched ${rawData.length} items from Unstop.`);
+    
+    return rawData.map((item: any) => ({
+      title: item.title || 'Scholarship/Workshop',
+      description: item.description || item.short_description || 'No description available',
+      eligibility: item.eligibility || 'Open to all students',
+      link: item.reg_url || item.url || '#',
+      type: 'Private' as const,
+      deadline: item.end_date || item.deadline,
     }));
   } catch (error) {
-    console.log('360Giving API failed:', error instanceof Error ? error.message : 'Unknown error');
-    return [];
+    console.log('Unstop API failed, trying Internship API as backup...');
+    
+    // Backup: Use the working internship host with 'scholarship' keyword
+    try {
+      const backupHost = 'internships-api.p.rapidapi.com';
+      const backupResponse = await axios.get(`https://${backupHost}/active-jb-7d`, {
+        params: {
+          title_filter: 'scholarship',
+          location_filter: 'India',
+          limit: '10'
+        },
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': backupHost
+        },
+        timeout: 5000
+      });
+
+      return backupResponse.data.map((item: any) => ({
+        title: item.title,
+        description: item.description_text || 'Scholarship opportunity',
+        eligibility: item.locations_derived?.[0]?.city || 'India',
+        link: item.url,
+        type: 'Private' as const,
+        deadline: item.post_date
+      }));
+    } catch (backupError) {
+      console.log('Backup API also failed.');
+      return [];
+    }
   }
 }
 
-// --- API 2: Bud4Study (via their partner API if available) ---
-// Note: Bud4Study doesn't have public API, but we can use their partner API
-async function fetchFromBuddy4Study(): Promise<ApiScholarship[]> {
-  try {
-    // This is a placeholder - you'd need to get API access from Buddy4Study
-    // For now, return empty array so fallback works
-    return [];
-  } catch (error) {
-    return [];
-  }
-}
 
 // --- Function to merge and deduplicate scholarships from multiple sources ---
 function mergeScholarships(arrays: ApiScholarship[][]): ApiScholarship[] {
@@ -109,46 +174,23 @@ function mergeScholarships(arrays: ApiScholarship[][]): ApiScholarship[] {
   return result;
 }
 
-// --- Main function that tries all APIs in sequence ---
+// --- Main function that merges API and static data ---
 export async function fetchScholarshipsFromAPIs(): Promise<ApiScholarship[]> {
-  console.log('Trying 360Giving API...');
-  const from360Giving = await fetchFrom360Giving();
+  console.log('Fetching scholarships from RapidAPI...');
   
-  if (from360Giving.length > 0) {
-    console.log(`✅ 360Giving returned ${from360Giving.length} scholarships`);
-    return from360Giving;
-  }
-
-  console.log('API failed or empty, using static scholarship data');
-  return STATIC_SCHOLARSHIPS;
-}
-
-// --- Alternative: Try all APIs in parallel and merge results ---
-export async function fetchScholarshipsParallel(): Promise<ApiScholarship[]> {
   try {
-    const results = await Promise.allSettled([
-      fetchFrom360Giving(),
-      fetchFromBuddy4Study(),
+    const rapidResults = await fetchFromRapidAPI();
+    
+    // RapidAPI is primary, followed by our curated static data
+    const merged = mergeScholarships([
+      rapidResults,
+      STATIC_SCHOLARSHIPS
     ]);
-
-    const successfulResults: ApiScholarship[][] = [];
-
-    for (const result of results) {
-      if (result.status === 'fulfilled' && result.value.length > 0) {
-        successfulResults.push(result.value);
-      }
-    }
-
-    if (successfulResults.length > 0) {
-      const merged = mergeScholarships(successfulResults);
-      console.log(`✅ Merged ${merged.length} scholarships from ${successfulResults.length} APIs`);
-      return merged;
-    }
-
-    console.log('All APIs failed, using static data');
-    return STATIC_SCHOLARSHIPS;
+    
+    console.log(`✅ Returned ${merged.length} scholarships (${rapidResults.length} from RapidAPI)`);
+    return merged;
   } catch (error) {
-    console.log('Parallel fetch failed, using static data');
+    console.error('Scholarship fetch error:', error);
     return STATIC_SCHOLARSHIPS;
   }
 }

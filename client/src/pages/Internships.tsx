@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import Hero from "../components/Hero";
 import ProtectedRoute from "../components/ProtectedRoute";
 import {
   useGetAllInternships,
@@ -190,31 +191,12 @@ export default function Internships() {
     <ProtectedRoute>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
         {/* Header */}
-        <div className="rounded-2xl overflow-hidden mb-6 shadow-card relative h-40">
-          <div className="absolute inset-0 bg-teal gradient-hero opacity-90" />
-          <div className="absolute inset-0 flex items-center px-8">
-            <div className="flex items-center gap-6">
-              <div className="hidden sm:flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 shadow-inner">
-                <Briefcase className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <div className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse" />
-                  <span className="text-white/80 text-sm font-medium uppercase tracking-wider">
-                    Work Experience
-                  </span>
-                </div>
-                <h1 className="font-heading text-3xl font-bold text-white tracking-tight">
-                  Internships
-                </h1>
-                <p className="text-white/75 text-sm max-w-md">
-                  Gain real-world experience and build your professional network
-                  with top companies.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Hero 
+          title="Internships" 
+          description="Gain real-world experience and build your professional network with top companies." 
+          icon={Briefcase} 
+          badge="Work Experience"
+        />
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">

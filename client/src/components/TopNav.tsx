@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { BookOpen, LogOut, User } from "lucide-react";
+import { BookOpen, LogOut, Moon, Sun, User } from "lucide-react";
+import { useTheme } from "next-themes";
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useGetCallerUserProfile } from "../hooks/useQueries";
@@ -17,6 +18,7 @@ import { usePwaInstall } from "../hooks/usePWAInstall";
 
 export default function TopNav() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const location = useLocation();
   const { logout } = useAuth();
   const { data: profile } = useGetCallerUserProfile();
@@ -86,6 +88,19 @@ export default function TopNav() {
         </nav>
 
         <div className="flex items-center gap-4">
+          {/* Theme Toggle */}
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-full hover:bg-muted transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5 text-amber-500" />
+            ) : (
+              <Moon className="h-5 w-5 text-teal-600" />
+            )}
+          </button>
+
           {/* Install App Button */}
           {isInstallable && (
             <Button

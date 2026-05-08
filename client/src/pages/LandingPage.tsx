@@ -20,9 +20,12 @@ import {
   GraduationCap,
   Loader2,
   MessageCircle,
+  Moon,
   School,
+  Sun,
   User,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
@@ -32,6 +35,7 @@ import { useSaveCallerUserProfile } from "../hooks/useQueries";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const { isAuthenticated, requestOTP, verifyOTP, loading } = useAuth();
   const saveProfile = useSaveCallerUserProfile();
 
@@ -177,8 +181,8 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur border-b border-border">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-50 glass-card !rounded-none border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
@@ -186,8 +190,22 @@ export default function LandingPage() {
               alt="Sarthi"
               className="h-10 w-10 rounded-lg object-contain"
             />
-            <span className="font-heading font-bold text-xl text-teal-600">Sarthi</span>
+            <span className="font-heading font-bold text-xl text-teal-600 dark:text-teal-400">Sarthi</span>
           </div>
+
+          <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-full hover:bg-muted transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5 text-amber-500" />
+              ) : (
+                <Moon className="h-5 w-5 text-teal-600" />
+              )}
+            </button>
 
           {/* Profile Icon with Login/Register Modal */}
           <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
@@ -416,24 +434,30 @@ export default function LandingPage() {
               )}
             </DialogContent>
           </Dialog>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="gradient-hero absolute inset-0 opacity-90" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="text-white space-y-6 animate-fade-in">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-4 py-1.5 text-sm font-medium">
+      <section className="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden">
+        <div className="gradient-hero absolute inset-0 -z-10" />
+        
+        {/* Animated Background Elements */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="text-slate-900 dark:text-white space-y-8 animate-fade-in">
+              <div className="inline-flex items-center gap-2 bg-teal-500/10 dark:bg-white/10 backdrop-blur-md border border-teal-500/20 dark:border-white/20 rounded-full px-4 py-1.5 text-sm font-medium text-teal-800 dark:text-white">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                 AI-Powered Career Guidance
               </div>
-              <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight">
+              <h1 className="font-heading text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
                 Your Digital Mentor for{" "}
-                <span className="text-amber-500">Career Success</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-500 dark:from-amber-400 dark:to-amber-600">Career Success</span>
               </h1>
-              <p className="text-white/85 text-lg leading-relaxed">
+              <p className="text-slate-700 dark:text-white/90 text-xl leading-relaxed max-w-lg">
                 Sarthi helps school and college students discover the right
                 career path, find scholarships, explore internships, and get
                 AI-powered guidance — all in one place.
@@ -448,16 +472,19 @@ export default function LandingPage() {
                   <ChevronRight className="ml-1 h-5 w-5" />
                 </Button>
               </div>
-              <p className="text-white/60 text-sm">
+              <p className="text-slate-500 dark:text-white/60 text-sm font-medium">
                 Secure login with email OTP · No password needed
               </p>
             </div>
-            <div className="hidden md:block">
-              <img
-                src="/assets/images/sarthi-dashboard.png"
-                alt="Sarthi Dashboard"
-                className="rounded-2xl shadow-2xl w-full object-cover"
-              />
+            <div className="hidden md:block animate-float">
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-amber-500 rounded-2xl blur opacity-30" />
+                <img
+                  src="/assets/images/sarthi-dashboard.png"
+                  alt="Sarthi Dashboard"
+                  className="relative rounded-2xl shadow-2xl w-full object-cover border border-white/10"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -478,7 +505,7 @@ export default function LandingPage() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="bg-card rounded-xl p-6 border border-border shadow-card card-hover"
+              className="glass-card rounded-xl p-6 card-hover"
             >
               <div
                 className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${feature.color}`}
@@ -498,7 +525,7 @@ export default function LandingPage() {
 
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center bg-card rounded-2xl border border-border p-10 shadow-card">
+        <div className="max-w-3xl mx-auto text-center glass-card rounded-2xl p-10">
           <GraduationCap className="h-12 w-12 text-teal-600 mx-auto mb-4" />
           <h2 className="font-heading text-2xl font-bold text-foreground mb-3">
             Ready to Find Your Path?

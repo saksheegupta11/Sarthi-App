@@ -98,18 +98,18 @@ export default function Dashboard() {
             alt="Dashboard Hero"
             className="w-full h-48 md:h-56 object-cover"
           />
-          <div className="absolute inset-0 gradient-hero opacity-80" />
+          <div className="absolute inset-0 gradient-hero" />
           <div className="absolute inset-0 flex flex-col justify-center px-8">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-amber-400" />
-              <span className="text-white/90 text-sm font-medium">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              <span className="text-slate-600 dark:text-white/90 text-sm font-medium">
                 {greeting}!
               </span>
             </div>
-            <h1 className="font-heading text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
-              Welcome back, <span className="text-white drop-shadow-lg">{displayName}</span> 👋
+            <h1 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+              Welcome back, <span className="text-teal-dark dark:text-teal-dark">{displayName}</span> 👋
             </h1>
-            <p className="text-white/80 mt-1 text-sm md:text-base drop-shadow">
+            <p className="text-slate-600 dark:text-white/80 mt-1 text-sm md:text-base">
               Your journey to a bright future starts here.
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function Dashboard() {
                 type="button"
                 key={card.path}
                 onClick={() => navigate({ to: card.path })}
-                className="group text-left bg-card rounded-xl border border-border shadow-card card-hover p-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+                className="group text-left glass-card rounded-xl card-hover p-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div
@@ -177,7 +177,7 @@ export default function Dashboard() {
             return (
               <div
                 key={stat.label}
-                className="bg-card rounded-xl border border-border p-4 text-center shadow-xs"
+                className="glass-card rounded-xl p-4 text-center"
               >
                 <Icon className="h-5 w-5 text-teal mx-auto mb-2" />
                 <div className="font-heading font-bold text-xl text-foreground">

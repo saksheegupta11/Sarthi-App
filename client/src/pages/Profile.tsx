@@ -160,7 +160,7 @@ export default function Profile() {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="font-heading text-xl font-bold text-foreground">
+                <h1 className="font-heading text-xl font-bold text-teal-dark dark:text-teal-dark">
                   {displayName}
                 </h1>
                 {profile?.educationLevel && (
@@ -200,7 +200,7 @@ export default function Profile() {
 
           {/* Edit Profile Tab */}
           <TabsContent value="edit">
-            <div className="bg-card rounded-2xl border border-border shadow-card p-6">
+            <div className="glass-card rounded-2xl p-6">
               <h2 className="font-heading font-semibold text-lg text-foreground mb-5">
                 Edit Profile
               </h2>

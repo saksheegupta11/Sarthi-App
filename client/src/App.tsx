@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
 import Layout from "./components/Layout";
+import MeshBackground from "./components/MeshBackground";
 import PWAInstallBanner from "./components/PWAInstallBanner";
 import CareerQuiz from "./pages/CareerQuiz";
 import CareerQuizResult from "./pages/CareerQuizResult";
@@ -135,6 +136,7 @@ declare module "@tanstack/react-router" {
 export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <MeshBackground />
       <RouterProvider router={router} />
       <Toaster richColors position="top-right" />
       <PWAInstallBanner />

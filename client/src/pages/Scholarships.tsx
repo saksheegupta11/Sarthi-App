@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import Hero from "../components/Hero";
 import ProtectedRoute from "../components/ProtectedRoute";
 import {
   useGetAllScholarships,
@@ -117,10 +118,7 @@ export default function Scholarships() {
       (s) => !backendTitles.has(s.title),
     );
     return [
-      ...(backendScholarships || []).map((s) => ({
-        ...s,
-        type: "Government" as const,
-      })),
+      ...(backendScholarships || []),
       ...staticFiltered,
     ];
   }, [backendScholarships]);
@@ -155,31 +153,12 @@ export default function Scholarships() {
     <ProtectedRoute>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
         {/* Header */}
-        <div className="rounded-2xl overflow-hidden mb-6 shadow-card relative h-40">
-          <div className="absolute inset-0 bg-teal gradient-hero opacity-90" />
-          <div className="absolute inset-0 flex items-center px-8">
-            <div className="flex items-center gap-6">
-              <div className="hidden sm:flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 shadow-inner">
-                <Award className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <div className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse" />
-                  <span className="text-white/80 text-sm font-medium uppercase tracking-wider">
-                    Financial Support
-                  </span>
-                </div>
-                <h1 className="font-heading text-3xl font-bold text-white tracking-tight">
-                  Scholarships
-                </h1>
-                <p className="text-white/75 text-sm max-w-md">
-                  Find the right scholarship opportunities to support your
-                  education journey.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Hero 
+          title="Scholarships" 
+          description="Find the right scholarship opportunities to support your education journey." 
+          icon={Award} 
+          badge="Financial Support"
+        />
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -200,8 +179,8 @@ export default function Scholarships() {
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   filter === f
-                    ? "gradient-teal text-white shadow-teal"
-                    : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-teal/40"
+                    ? "gradient-teal text-white shadow-premium"
+                    : "glass-card text-muted-foreground hover:text-foreground hover:border-teal/40"
                 }`}
               >
                 {f}
@@ -231,7 +210,7 @@ export default function Scholarships() {
               return (
                 <div
                   key={scholarship.title}
-                  className="bg-card rounded-xl border border-border shadow-card card-hover p-5 flex flex-col"
+                  className="glass-card rounded-xl card-hover p-5 flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <Badge

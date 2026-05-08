@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%; /* Softer off-white with a hint of blue/teal */
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -25,13 +25,13 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
 
-    /* Custom teal/amber colors (oklch) */
-    --teal: 0.42 0.12 195;
-    --teal-light: 0.72 0.08 195;
-    --teal-dark: 0.28 0.1 195;
-    --amber: 0.72 0.16 75;
-    --amber-light: 0.88 0.12 75;
-    --amber-dark: 0.55 0.18 55;
+    /* Premium Light Mode Palette */
+    --teal: 0.45 0.14 195;
+    --teal-light: 0.95 0.05 195;
+    --teal-dark: 0.35 0.12 195;
+    --amber: 0.85 0.16 75;
+    --amber-light: 0.97 0.04 75;
+    --amber-dark: 0.65 0.18 55;
   }
 
   .dark {
@@ -54,12 +54,12 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --teal: 0.62 0.14 195;
-    --teal-light: 0.75 0.1 195;
-    --teal-dark: 0.42 0.12 195;
-    --amber: 0.72 0.16 75;
-    --amber-light: 0.85 0.12 75;
-    --amber-dark: 0.55 0.18 55;
+    --teal: 0.62 0.12 195;
+    --teal-light: 0.82 0.08 195;
+    --teal-dark: 0.45 0.14 195;
+    --amber: 0.75 0.15 65;
+    --amber-light: 0.92 0.1 65;
+    --amber-dark: 0.55 0.18 65;
   }
 }
 
@@ -72,6 +72,21 @@
     @apply bg-gradient-to-br from-[oklch(var(--amber))] to-[oklch(var(--amber-dark))];
   }
 
+  .gradient-hero {
+    @apply transition-all duration-700 ease-in-out relative overflow-hidden border-b border-border/50;
+    background: linear-gradient(135deg, oklch(var(--teal-light)) 0%, hsl(var(--background)) 50%, oklch(var(--amber-light)) 100%);
+  }
+
+  .dark .gradient-hero {
+    background: linear-gradient(135deg, oklch(var(--teal-dark)) 0%, hsl(var(--background)) 100%);
+    border-bottom: 1px solid oklch(var(--teal) / 0.2);
+  }
+
+  .gradient-hero::before {
+    content: '';
+    @apply absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10;
+  }
+
   .shadow-card {
     @apply shadow-[0_8px_30px_rgb(0,0,0,0.04)];
   }
@@ -79,4 +94,47 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1;
   }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+}
+.glass-card {
+  @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-premium;
+}
+
+.mesh-bg {
+  @apply fixed inset-0 -z-20 overflow-hidden pointer-events-none opacity-50 dark:opacity-20;
+  background-color: hsl(var(--background));
+}
+
+.mesh-blob {
+  @apply absolute blur-[120px] rounded-full opacity-30 animate-slow-spin;
+}
+
+.shadow-premium {
+  @apply shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)];
+}
+
+.animate-slow-spin {
+  animation: slow-spin 30s linear infinite;
+}
+
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
