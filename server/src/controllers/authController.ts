@@ -87,22 +87,22 @@ export const requestOTP = async (req: Request, res: Response): Promise<void> => 
         { email, otp, otpExpiry },
         { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
       );
-    } catch (dbError) {
+    } catch (dbError: any) {
       console.error('Database Error in requestOTP:', dbError);
-      res.status(500).json({ message: 'Database error while generating OTP' });
+      res.status(500).json({ message: 'Database error while generating OTP', error: dbError.message });
       return;
     }
 
     try {
       await sendOTP(email, otp);
       res.json({ message: 'OTP sent successfully' });
-    } catch (mailError) {
+    } catch (mailError: any) {
       console.error('Email Error in requestOTP:', mailError);
-      res.status(500).json({ message: 'Failed to send OTP email' });
+      res.status(500).json({ message: 'Failed to send OTP email', error: mailError.message });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('General Error in requestOTP:', error);
-    res.status(500).json({ message: 'An unexpected error occurred' });
+    res.status(500).json({ message: 'An unexpected error occurred', error: error.message });
   }
 };
 
