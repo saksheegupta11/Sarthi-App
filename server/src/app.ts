@@ -22,10 +22,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://sarthi-df5g6jotv-saksheegupta986-1149s-projects.vercel.app"
-  ],
+  origin: "*",
   credentials: true
 }));
 app.use(express.json());
