@@ -447,7 +447,7 @@ export default function LandingPage() {
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-slate-900 dark:text-white space-y-8 animate-fade-in">
               <div className="inline-flex items-center gap-2 bg-teal-500/10 dark:bg-white/10 backdrop-blur-md border border-teal-500/20 dark:border-white/20 rounded-full px-4 py-1.5 text-sm font-medium text-teal-800 dark:text-white">
