@@ -207,241 +207,242 @@ export default function LandingPage() {
               )}
             </button>
 
-          {/* Profile Icon with Login/Register Modal */}
-          <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
-              >
-                <User className="h-5 w-5 text-muted-foreground" />
-              </button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="text-center">
-                  {otpSent ? "Verify OTP" : "Welcome to Sarthi"}
-                </DialogTitle>
-                <DialogDescription className="text-center">
-                  {otpSent
-                    ? "Enter the 6-digit OTP sent to your email"
-                    : "Login or create your account"}
-                </DialogDescription>
-              </DialogHeader>
+            {/* Profile Icon with Login/Register Modal */}
+            <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                >
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="text-center">
+                    {otpSent ? "Verify OTP" : "Welcome to Sarthi"}
+                  </DialogTitle>
+                  <DialogDescription className="text-center">
+                    {otpSent
+                      ? "Enter the 6-digit OTP sent to your email"
+                      : "Login or create your account"}
+                  </DialogDescription>
+                </DialogHeader>
 
-              {!otpSent ? (
-                <Tabs defaultValue="login" className="w-full" onValueChange={() => setLoginError("")}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="login">Login</TabsTrigger>
-                    <TabsTrigger value="register">Register</TabsTrigger>
-                  </TabsList>
+                {!otpSent ? (
+                  <Tabs defaultValue="login" className="w-full" onValueChange={() => setLoginError("")}>
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="login">Login</TabsTrigger>
+                      <TabsTrigger value="register">Register</TabsTrigger>
+                    </TabsList>
 
-                  {/* Login Tab */}
-                  <TabsContent value="login">
-                    <form onSubmit={handleLoginRequestOTP} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="login-email">Email</Label>
-                        <Input
-                          id="login-email"
-                          type="email"
-                          placeholder="your.email@example.com"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            setLoginError("");
-                          }}
-                          required
-                          className={loginError ? "border-red-500" : ""}
-                        />
-                      </div>
-                      {loginError && (
-                        <p className="text-xs font-medium text-red-500 mt-1">
-                          {loginError}
-                        </p>
+                    {/* Login Tab */}
+                    <TabsContent value="login">
+                      <form onSubmit={handleLoginRequestOTP} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="login-email">Email</Label>
+                          <Input
+                            id="login-email"
+                            type="email"
+                            placeholder="your.email@example.com"
+                            value={email}
+                            onChange={(e) => {
+                              setEmail(e.target.value);
+                              setLoginError("");
+                            }}
+                            required
+                            className={loginError ? "border-red-500" : ""}
+                          />
+                        </div>
+                        {loginError && (
+                          <p className="text-xs font-medium text-red-500 mt-1">
+                            {loginError}
+                          </p>
+                        )}
+                        <Button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all"
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Sending OTP...
+                            </>
+                          ) : (
+                            "Login with Email"
+                          )}
+                        </Button>
+
+                      </form>
+                    </TabsContent>
+
+                    {/* Register Tab */}
+                    <TabsContent value="register">
+                      <form onSubmit={handleRegister} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-name">Full Name *</Label>
+                          <Input
+                            id="reg-name"
+                            placeholder="e.g. Arjun Sharma"
+                            value={regName}
+                            onChange={(e) => setRegName(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-email">Email *</Label>
+                          <Input
+                            id="reg-email"
+                            type="email"
+                            placeholder="your.email@example.com"
+                            value={regEmail}
+                            onChange={(e) => setRegEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-phone">Phone Number *</Label>
+                          <Input
+                            id="reg-phone"
+                            type="tel"
+                            placeholder="9876543210"
+                            value={regPhone}
+                            onChange={(e) => setRegPhone(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-country">Country *</Label>
+                          <Input
+                            id="reg-country"
+                            placeholder="e.g. India"
+                            value={regCountry}
+                            onChange={(e) => setRegCountry(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-state">State *</Label>
+                          <Input
+                            id="reg-state"
+                            placeholder="e.g. Maharashtra"
+                            value={regState}
+                            onChange={(e) => setRegState(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-city">City *</Label>
+                          <Input
+                            id="reg-city"
+                            placeholder="e.g. Mumbai"
+                            value={regCity}
+                            onChange={(e) => setRegCity(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-education">Education Level *</Label>
+                          <select
+                            id="reg-education"
+                            value={regEducation}
+                            onChange={(e) => setRegEducation(e.target.value)}
+                            required
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          >
+                            <option value="">Select education level</option>
+                            <option value="10th">Class 10 (Matriculation)</option>
+                            <option value="12th">Class 12 (Intermediate)</option>
+                            <option value="ug">Undergraduate (B.A., B.Sc., B.Com, B.Tech)</option>
+                            <option value="pg">Postgraduate (M.A., M.Sc., M.Com, M.Tech)</option>
+                            <option value="diploma">Diploma</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reg-stream">Stream (Optional)</Label>
+                          <select
+                            id="reg-stream"
+                            value={regStream}
+                            onChange={(e) => setRegStream(e.target.value)}
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          >
+                            <option value="">Select stream (optional)</option>
+                            <option value="science">Science (PCM/PCB)</option>
+                            <option value="commerce">Commerce</option>
+                            <option value="arts">Arts/Humanities</option>
+                            <option value="vocational">Vocational</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <Button
+                          type="submit"
+                          disabled={regLoading}
+                          className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all"
+                        >
+                          {regLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Registering...
+                            </>
+                          ) : (
+                            "Register"
+                          )}
+                        </Button>
+                      </form>
+                    </TabsContent>
+                  </Tabs>
+                ) : (
+                  <form onSubmit={handleVerifyOTP} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="otp">OTP</Label>
+                      <Input
+                        id="otp"
+                        type="text"
+                        placeholder="123456"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        required
+                        maxLength={6}
+                        className="text-center text-lg tracking-widest"
+                        autoFocus
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Verifying...
+                        </>
+                      ) : (
+                        "Verify OTP"
                       )}
-                      <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all"
-                      >
-                        {loading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Sending OTP...
-                          </>
-                        ) : (
-                          "Login with Email"
-                        )}
-                      </Button>
-
-                    </form>
-                  </TabsContent>
-
-                  {/* Register Tab */}
-                  <TabsContent value="register">
-                    <form onSubmit={handleRegister} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-name">Full Name *</Label>
-                        <Input
-                          id="reg-name"
-                          placeholder="e.g. Arjun Sharma"
-                          value={regName}
-                          onChange={(e) => setRegName(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-email">Email *</Label>
-                        <Input
-                          id="reg-email"
-                          type="email"
-                          placeholder="your.email@example.com"
-                          value={regEmail}
-                          onChange={(e) => setRegEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-phone">Phone Number *</Label>
-                        <Input
-                          id="reg-phone"
-                          type="tel"
-                          placeholder="9876543210"
-                          value={regPhone}
-                          onChange={(e) => setRegPhone(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-country">Country *</Label>
-                        <Input
-                          id="reg-country"
-                          placeholder="e.g. India"
-                          value={regCountry}
-                          onChange={(e) => setRegCountry(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-state">State *</Label>
-                        <Input
-                          id="reg-state"
-                          placeholder="e.g. Maharashtra"
-                          value={regState}
-                          onChange={(e) => setRegState(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-city">City *</Label>
-                        <Input
-                          id="reg-city"
-                          placeholder="e.g. Mumbai"
-                          value={regCity}
-                          onChange={(e) => setRegCity(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-education">Education Level *</Label>
-                        <select
-                          id="reg-education"
-                          value={regEducation}
-                          onChange={(e) => setRegEducation(e.target.value)}
-                          required
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                          <option value="">Select education level</option>
-                          <option value="10th">Class 10 (Matriculation)</option>
-                          <option value="12th">Class 12 (Intermediate)</option>
-                          <option value="ug">Undergraduate (B.A., B.Sc., B.Com, B.Tech)</option>
-                          <option value="pg">Postgraduate (M.A., M.Sc., M.Com, M.Tech)</option>
-                          <option value="diploma">Diploma</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-stream">Stream (Optional)</Label>
-                        <select
-                          id="reg-stream"
-                          value={regStream}
-                          onChange={(e) => setRegStream(e.target.value)}
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                          <option value="">Select stream (optional)</option>
-                          <option value="science">Science (PCM/PCB)</option>
-                          <option value="commerce">Commerce</option>
-                          <option value="arts">Arts/Humanities</option>
-                          <option value="vocational">Vocational</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                      <Button
-                        type="submit"
-                        disabled={regLoading}
-                        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all"
-                      >
-                        {regLoading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Registering...
-                          </>
-                        ) : (
-                          "Register"
-                        )}
-                      </Button>
-                    </form>
-                  </TabsContent>
-                </Tabs>
-              ) : (
-                <form onSubmit={handleVerifyOTP} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="otp">OTP</Label>
-                    <Input
-                      id="otp"
-                      type="text"
-                      placeholder="123456"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      required
-                      maxLength={6}
-                      className="text-center text-lg tracking-widest"
-                      autoFocus
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verifying...
-                      </>
-                    ) : (
-                      "Verify OTP"
-                    )}
-                  </Button>
-                  <button
-                    type="button"
-                    onClick={() => setOtpSent(false)}
-                    className="text-sm text-muted-foreground hover:text-teal-600 w-full text-center"
-                  >
-                    Back to login/register
-                  </button>
-                </form>
-              )}
-            </DialogContent>
-          </Dialog>
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => setOtpSent(false)}
+                      className="text-sm text-muted-foreground hover:text-teal-600 w-full text-center"
+                    >
+                      Back to login/register
+                    </button>
+                  </form>
+                )}
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden">
+      
+      <section className="relative pt-0 pb-24 md:pt-0 md:pb-32 overflow-hidden">
         <div className="gradient-hero absolute inset-0 -z-10" />
-        
+
         {/* Animated Background Elements */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />

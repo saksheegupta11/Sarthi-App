@@ -1,3 +1,4 @@
+
 import { Request, Response } from 'express';
 import User from '../models/User';
 import nodemailer from 'nodemailer';
@@ -8,19 +9,17 @@ const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 // Send OTP via email
 const sendOTP = async (email: string, otp: string) => {
-  if (!process.env['SENDGRID_API_KEY'] || !process.env['EMAIL_USER']) {
-    const missing = !process.env['SENDGRID_API_KEY'] ? 'SENDGRID_API_KEY' : 'EMAIL_USER';
+  if (!process.env['EMAIL_USER'] || !process.env['EMAIL_PASS']) {
+    const missing = !process.env['EMAIL_USER'] ? 'EMAIL_USER' : 'EMAIL_PASS';
     console.error(`Missing Environment Variable: ${missing}`);
     throw new Error(`Email configuration error: ${missing} is missing`);
   }
 
   const transporter = nodemailer.createTransport({
-    host: 'smtp.sendgrid.net',
-    port: 587,
-    secure: false, 
+    service: 'gmail',
     auth: {
-      user: 'apikey', // This is literal string 'apikey'
-      pass: process.env['SENDGRID_API_KEY'],
+      user: process.env['EMAIL_USER'],
+      pass: process.env['EMAIL_PASS']?.trim(),
     },
   });
 
@@ -75,7 +74,7 @@ export const requestOTP = async (req: Request, res: Response): Promise<void> => 
     try {
       await User.findOneAndUpdate(
         { email },
-        { email, otp, otpExpiry },
+        { $set: { email, otp, otpExpiry } },
         { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
       );
     } catch (dbError: any) {
@@ -125,8 +124,9 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
 
     // Return user data (without OTP fields)
     const userData = {
+      _id: user._id,
       email: user.email,
-      name: user.name,
+      name: user.name || "",
       language: user.language,
       appearance: user.appearance,
     };
