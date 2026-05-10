@@ -8,29 +8,20 @@ const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 // Send OTP via email
 const sendOTP = async (email: string, otp: string) => {
-  console.log('Attempting to send OTP. Credentials status:', {
-    user: !!process.env['EMAIL_USER'],
-    pass: !!process.env['EMAIL_PASS']
-  });
-
-  if (!process.env['EMAIL_USER'] || !process.env['EMAIL_PASS']) {
-    const missing = !process.env['EMAIL_USER'] ? 'EMAIL_USER' : 'EMAIL_PASS';
+  if (!process.env['SENDGRID_API_KEY'] || !process.env['EMAIL_USER']) {
+    const missing = !process.env['SENDGRID_API_KEY'] ? 'SENDGRID_API_KEY' : 'EMAIL_USER';
     console.error(`Missing Environment Variable: ${missing}`);
     throw new Error(`Email configuration error: ${missing} is missing`);
   }
 
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: 'smtp.sendgrid.net',
     port: 587,
-    secure: false, // Use STARTTLS
+    secure: false, 
     auth: {
-      user: process.env['EMAIL_USER'],
-      pass: process.env['EMAIL_PASS'],
+      user: 'apikey', // This is literal string 'apikey'
+      pass: process.env['SENDGRID_API_KEY'],
     },
-    tls: {
-      rejectUnauthorized: false,
-      minVersion: 'TLSv1.2'
-    }
   });
 
   const mailOptions = {
