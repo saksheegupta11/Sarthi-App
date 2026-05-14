@@ -1,57 +1,41 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
-import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
+import { Resend } from 'resend';
+
+// Initialize Resend
+const resend = new Resend(process.env['RESEND_API_KEY']);
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Send OTP via email - FIXED for Render (IPv4 forced)
+// Send OTP via Resend (works on Render)
 const sendOTP = async (email: string, otp: string) => {
-  if (!process.env['EMAIL_USER'] || !process.env['EMAIL_PASS']) {
-    const missing = !process.env['EMAIL_USER'] ? 'EMAIL_USER' : 'EMAIL_PASS';
-    console.error(`Missing Environment Variable: ${missing}`);
-    throw new Error(`Email configuration error: ${missing} is missing`);
+  if (!process.env['RESEND_API_KEY']) {
+    throw new Error('RESEND_API_KEY is missing in environment variables');
   }
 
-  // ✅ Use 'as any' to bypass TypeScript strictness
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env['EMAIL_USER'],
-      pass: process.env['EMAIL_PASS']?.trim(),
-    },
-    // Force IPv4 - resolves Render's IPv6 connectivity issue
-    socketOptions: {
-      family: 4,
-    },
-  } as any);
-
-  const mailOptions = {
-    from: `"Sarthi App" <${process.env['EMAIL_USER']}>`,
+  const { error } = await resend.emails.send({
+    from: 'onboarding@resend.dev', // Resend’s default sender – works immediately
     to: email,
     subject: 'Your Sarthi Login OTP',
-    text: `Your OTP is: ${otp}. It is valid for 3 minutes.`,
     html: `<div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
       <h2 style="color: #4A90E2;">Sarthi Login Verification</h2>
-      <p>Use the following One-Time Password (OTP) to complete your login:</p>
+      <p>Use the following OTP to complete your login:</p>
       <div style="font-size: 24px; font-weight: bold; padding: 10px; background: #f9f9f9; text-align: center; letter-spacing: 5px;">
         ${otp}
       </div>
       <p>This OTP is valid for <strong>3 minutes</strong>.</p>
       <p>If you didn't request this, please ignore this email.</p>
     </div>`,
-  };
+  });
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
-  } catch (error) {
-    console.error('Detailed Nodemailer Error:', error);
-    throw error;
+  if (error) {
+    console.error('Resend error:', error);
+    throw new Error('Failed to send OTP email');
   }
+
+  console.log(`OTP sent to ${email}`);
 };
 
 // Request OTP
@@ -74,33 +58,21 @@ export const requestOTP = async (req: Request, res: Response): Promise<void> => 
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
 
-    // Upsert user
-    try {
-      await User.findOneAndUpdate(
-        { email },
-        { $set: { email, otp, otpExpiry } },
-        { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
-      );
-    } catch (dbError: any) {
-      console.error('Database Error in requestOTP:', dbError);
-      res.status(500).json({ message: 'Database error while generating OTP', error: dbError.message });
-      return;
-    }
+    await User.findOneAndUpdate(
+      { email },
+      { $set: { email, otp, otpExpiry } },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
+    );
 
-    try {
-      await sendOTP(email, otp);
-      res.json({ message: 'OTP sent successfully' });
-    } catch (mailError: any) {
-      console.error('Email Error in requestOTP:', mailError);
-      res.status(500).json({ message: 'Failed to send OTP email', error: mailError.message });
-    }
+    await sendOTP(email, otp);
+    res.json({ message: 'OTP sent successfully' });
   } catch (error: any) {
-    console.error('General Error in requestOTP:', error);
-    res.status(500).json({ message: 'An unexpected error occurred', error: error.message });
+    console.error('requestOTP error:', error);
+    res.status(500).json({ message: error.message || 'Failed to send OTP' });
   }
 };
 
-// Verify OTP
+// Verify OTP (unchanged)
 export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, otp } = req.body;
@@ -111,29 +83,26 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Clear OTP fields
     await User.updateOne({ _id: user._id }, { $unset: { otp: "", otpExpiry: "" } });
 
     const jwtSecret = process.env['JWT_SECRET'];
     if (!jwtSecret) {
-      console.error('JWT_SECRET is not defined');
       res.status(500).json({ message: 'Server configuration error' });
       return;
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, jwtSecret, {
-      expiresIn: '7d',
+    const token = jwt.sign({ userId: user._id, email: user.email }, jwtSecret, { expiresIn: '7d' });
+
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name || "",
+        language: user.language,
+        appearance: user.appearance,
+      }
     });
-
-    const userData = {
-      _id: user._id,
-      email: user.email,
-      name: user.name || "",
-      language: user.language,
-      appearance: user.appearance,
-    };
-
-    res.json({ token, user: userData });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Verification failed' });
@@ -148,7 +117,6 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
       res.status(401).json({ message: 'Unauthorized' });
       return;
     }
-
     const user = await User.findById(userId).select('-otp -otpExpiry');
     res.json(user);
   } catch (error) {

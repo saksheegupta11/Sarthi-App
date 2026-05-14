@@ -26,7 +26,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.4",
     "node-cache": "^5.1.2",
-    "nodemailer": "^8.0.7"
+    "nodemailer": "^8.0.7",
+    "resend": "^6.12.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
