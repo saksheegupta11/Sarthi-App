@@ -25,8 +25,11 @@ const sendOTP = async (email: string, otp: string) => {
     port: 465,
     secure: true,
     auth: {
+      type: 'OAuth2',
       user: process.env['EMAIL_USER'],
-      pass: process.env['EMAIL_PASS']?.trim(),
+      clientId: process.env['GOOGLE_CLIENT_ID'],
+      clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+      refreshToken: process.env['GOOGLE_REFRESH_TOKEN'],
     },
     tls: {
       // Must specify the servername since we are connecting via IP address
