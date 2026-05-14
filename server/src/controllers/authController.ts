@@ -1,48 +1,34 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
-import dns from 'dns';
-import { promisify } from 'util';
-
-const resolve4 = promisify(dns.resolve4);
+import { google } from 'googleapis';
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Send OTP via Nodemailer with Gmail Service
+// Send OTP via Gmail API (HTTPS) to bypass Render's SMTP block
 const sendOTP = async (email: string, otp: string) => {
-  if (!process.env['EMAIL_USER'] || !process.env['EMAIL_PASS']) {
-    throw new Error('EMAIL_USER or EMAIL_PASS is missing in environment variables');
+  if (!process.env['GOOGLE_CLIENT_ID'] || !process.env['GOOGLE_CLIENT_SECRET'] || !process.env['GOOGLE_REFRESH_TOKEN']) {
+    throw new Error('Google OAuth credentials are missing in environment variables');
   }
 
-  // Force IPv4 lookup dynamically to bypass Render's IPv6 ENETUNREACH error
-  const ipv4Addresses = await resolve4('smtp.gmail.com');
-  const hostIp = ipv4Addresses[0]; // Gets the first valid IPv4 address
+  const oAuth2Client = new google.auth.OAuth2(
+    process.env['GOOGLE_CLIENT_ID'],
+    process.env['GOOGLE_CLIENT_SECRET'],
+    "https://developers.google.com/oauthplayground"
+  );
 
-  const transporter = nodemailer.createTransport({
-    host: hostIp,
-    port: 465,
-    secure: true,
-    auth: {
-      type: 'OAuth2',
-      user: process.env['EMAIL_USER'],
-      clientId: process.env['GOOGLE_CLIENT_ID'],
-      clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-      refreshToken: process.env['GOOGLE_REFRESH_TOKEN'],
-    },
-    tls: {
-      // Must specify the servername since we are connecting via IP address
-      servername: 'smtp.gmail.com',
-      rejectUnauthorized: false
-    }
-  } as any);
+  oAuth2Client.setCredentials({ refresh_token: process.env['GOOGLE_REFRESH_TOKEN'] });
 
-  const mailOptions = {
-    from: `"Sarthi App" <${process.env['EMAIL_USER']}>`,
-    to: email,
-    subject: 'Your Sarthi Login OTP',
-    html: `<div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
+  const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+  const rawMessage = [
+    `From: "Sarthi App" <${process.env['EMAIL_USER']}>`,
+    `To: ${email}`,
+    `Subject: Your Sarthi Login OTP`,
+    `Content-Type: text/html; charset=utf-8`,
+    ``,
+    `<div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
       <h2 style="color: #4A90E2;">Sarthi Login Verification</h2>
       <p>Use the following OTP to complete your login:</p>
       <div style="font-size: 24px; font-weight: bold; padding: 10px; background: #f9f9f9; text-align: center; letter-spacing: 5px;">
@@ -50,14 +36,26 @@ const sendOTP = async (email: string, otp: string) => {
       </div>
       <p>This OTP is valid for <strong>3 minutes</strong>.</p>
       <p>If you didn't request this, please ignore this email.</p>
-    </div>`,
-  };
+    </div>`
+  ].join('\r\n');
+
+  // The Gmail API requires base64url encoded strings
+  const encodedMessage = Buffer.from(rawMessage)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`OTP sent to ${email}: ${info.response}`);
+    const info = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+    console.log(`OTP sent to ${email}: ${info.data.id}`);
   } catch (error) {
-    console.error('Nodemailer error:', error);
+    console.error('Gmail API error:', error);
     throw new Error('Failed to send OTP email');
   }
 };
