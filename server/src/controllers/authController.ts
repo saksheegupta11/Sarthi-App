@@ -1,22 +1,27 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
-import { Resend } from 'resend';
-
-// Initialize Resend
-const resend = new Resend(process.env['RESEND_API_KEY']);
+import nodemailer from 'nodemailer';
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Send OTP via Resend (works on Render)
+// Send OTP via Nodemailer with Gmail Service
 const sendOTP = async (email: string, otp: string) => {
-  if (!process.env['RESEND_API_KEY']) {
-    throw new Error('RESEND_API_KEY is missing in environment variables');
+  if (!process.env['EMAIL_USER'] || !process.env['EMAIL_PASS']) {
+    throw new Error('EMAIL_USER or EMAIL_PASS is missing in environment variables');
   }
 
-  const { error } = await resend.emails.send({
-    from: 'onboarding@resend.dev', // Resend’s default sender – works immediately
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env['EMAIL_USER'],
+      pass: process.env['EMAIL_PASS']?.trim(),
+    },
+  });
+
+  const mailOptions = {
+    from: `"Sarthi App" <${process.env['EMAIL_USER']}>`,
     to: email,
     subject: 'Your Sarthi Login OTP',
     html: `<div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
@@ -28,14 +33,15 @@ const sendOTP = async (email: string, otp: string) => {
       <p>This OTP is valid for <strong>3 minutes</strong>.</p>
       <p>If you didn't request this, please ignore this email.</p>
     </div>`,
-  });
+  };
 
-  if (error) {
-    console.error('Resend error:', error);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`OTP sent to ${email}: ${info.response}`);
+  } catch (error) {
+    console.error('Nodemailer error:', error);
     throw new Error('Failed to send OTP email');
   }
-
-  console.log(`OTP sent to ${email}`);
 };
 
 // Request OTP
