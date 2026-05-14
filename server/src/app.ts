@@ -22,6 +22,7 @@ const app = express();
 
 // ✅ CORRECT CORS CONFIGURATION
 const allowedOrigins = [
+  'https://sarthi-app-orpin.vercel.app',
   'https://sarthi-df5g6jotv-saksheegupta986-1149s-projects.vercel.app',
   'http://localhost:5173',  // local development ke liye (agar Vite use kar rahe ho)
   'http://localhost:3000'   // local React ke liye
