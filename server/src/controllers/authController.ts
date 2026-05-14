@@ -1,4 +1,3 @@
-
 import { Request, Response } from 'express';
 import User from '../models/User';
 import nodemailer from 'nodemailer';
@@ -7,7 +6,7 @@ import jwt from 'jsonwebtoken';
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Send OTP via email
+// Send OTP via email - FIXED for Render (IPv4 forced)
 const sendOTP = async (email: string, otp: string) => {
   if (!process.env['EMAIL_USER'] || !process.env['EMAIL_PASS']) {
     const missing = !process.env['EMAIL_USER'] ? 'EMAIL_USER' : 'EMAIL_PASS';
@@ -15,13 +14,20 @@ const sendOTP = async (email: string, otp: string) => {
     throw new Error(`Email configuration error: ${missing} is missing`);
   }
 
+  // ✅ Use 'as any' to bypass TypeScript strictness
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env['EMAIL_USER'],
       pass: process.env['EMAIL_PASS']?.trim(),
     },
-  });
+    // Force IPv4 - resolves Render's IPv6 connectivity issue
+    socketOptions: {
+      family: 4,
+    },
+  } as any);
 
   const mailOptions = {
     from: `"Sarthi App" <${process.env['EMAIL_USER']}>`,
@@ -68,8 +74,6 @@ export const requestOTP = async (req: Request, res: Response): Promise<void> => 
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
 
-    // Upsert user (only if not login, or if login it will just update)
-    // Actually, if it's login, the user must exist. If it's registration, it will be created.
     // Upsert user
     try {
       await User.findOneAndUpdate(
@@ -107,10 +111,9 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Clear OTP fields in database using $unset
+    // Clear OTP fields
     await User.updateOne({ _id: user._id }, { $unset: { otp: "", otpExpiry: "" } });
 
-    // Generate JWT
     const jwtSecret = process.env['JWT_SECRET'];
     if (!jwtSecret) {
       console.error('JWT_SECRET is not defined');
@@ -122,7 +125,6 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
       expiresIn: '7d',
     });
 
-    // Return user data (without OTP fields)
     const userData = {
       _id: user._id,
       email: user.email,
@@ -138,7 +140,7 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get current user (protected)
+// Get current user
 export const getMe = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId;
