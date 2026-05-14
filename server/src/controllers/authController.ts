@@ -3,9 +3,9 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import dns from 'dns';
+import { promisify } from 'util';
 
-// Fix for Node 18+ and Render's IPv6 routing issue
-dns.setDefaultResultOrder('ipv4first');
+const resolve4 = promisify(dns.resolve4);
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -16,18 +16,21 @@ const sendOTP = async (email: string, otp: string) => {
     throw new Error('EMAIL_USER or EMAIL_PASS is missing in environment variables');
   }
 
+  // Force IPv4 lookup dynamically to bypass Render's IPv6 ENETUNREACH error
+  const ipv4Addresses = await resolve4('smtp.gmail.com');
+  const hostIp = ipv4Addresses[0]; // Gets the first valid IPv4 address
+
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: hostIp,
     port: 465,
     secure: true,
     auth: {
       user: process.env['EMAIL_USER'],
       pass: process.env['EMAIL_PASS']?.trim(),
     },
-    // Force IPv4. Render's IPv6 connection to Google often drops/times out.
-    family: 4,
     tls: {
-      // Disabling strict TLS verification can help in restrictive cloud environments
+      // Must specify the servername since we are connecting via IP address
+      servername: 'smtp.gmail.com',
       rejectUnauthorized: false
     }
   } as any);
