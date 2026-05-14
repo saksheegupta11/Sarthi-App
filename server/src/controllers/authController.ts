@@ -13,12 +13,20 @@ const sendOTP = async (email: string, otp: string) => {
   }
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env['EMAIL_USER'],
       pass: process.env['EMAIL_PASS']?.trim(),
     },
-  });
+    // Force IPv4. Render's IPv6 connection to Google often drops/times out.
+    family: 4,
+    tls: {
+      // Disabling strict TLS verification can help in restrictive cloud environments
+      rejectUnauthorized: false
+    }
+  } as any);
 
   const mailOptions = {
     from: `"Sarthi App" <${process.env['EMAIL_USER']}>`,
