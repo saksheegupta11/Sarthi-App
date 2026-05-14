@@ -2,6 +2,10 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import dns from 'dns';
+
+// Fix for Node 18+ and Render's IPv6 routing issue
+dns.setDefaultResultOrder('ipv4first');
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
